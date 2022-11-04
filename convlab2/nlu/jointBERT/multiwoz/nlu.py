@@ -1,5 +1,6 @@
 import os
 import re
+import shutil
 import zipfile
 import tarfile
 import json
@@ -49,12 +50,14 @@ class BERTNLU(NLU):
             if not os.path.exists(output_dir):
                 os.makedirs(output_dir)
             print('Load from model_file param')
-            archive_file = cached_path(model_file)
-            print(archive_file)
-            archive = zipfile.ZipFile(archive_file, 'r')
-            print(archive)
-            archive.extractall(root_dir)
-            archive.close()
+            shutil.copytree(model_path, root_dir)
+#             archive_file = cached_path(model_file)
+#             print(archive_file)
+#             archive = zipfile.ZipFile(archive_file, 'r')
+#             print(archive)
+#             archive.extractall(root_dir)
+#             archive.close()
+
             
         print('Load from', best_model_path)
         model = JointBERT(config['model'], DEVICE, dataloader.tag_dim, dataloader.intent_dim)
