@@ -45,17 +45,25 @@ class BERTNLU(NLU):
             if not os.path.exists(output_dir):
                 os.makedirs(output_dir)
             print('Load from model_file param')
-            archive_file = cached_path(model_file)
+#           archive_file = cached_path(model_file)
             #archive = zipfile.ZipFile(archive_file, 'r')
             #archive.extractall(root_dir)
             #archive.close()
-#             with open(archive_file, 'wb') as outFile:
-#                 outFile.write(data)
-#                 outFile.close()   # was missing this
-#             with zipfile.ZipFile(archive_file, 'r') as zip:
-#                 zip.extractall(root_dir)
-            file = tarfile.open(fileobj=archive_file, mode="r|gz")
-            file.extractall(path=root_dir)
+            def fix_zip_file(zipFileContainer):
+#                 Read the contents of the file
+                content = zipFileContainer.read()
+                pos = content.rfind("\x50\x4b\x05\x06".encode())  # reverse find: this string of bytes is the end of the zip's central directory.
+                if pos>0:  # Double check we're not at the beginning of the file so we don't blank out the file
+                    zipFileContainer.seek(pos+20)  # Seek to +20 in the file; see secion V.I in 'ZIP format' link above.
+                    zipFileContainer.truncate()  # Delete everything that comes after our current position in the file (where we `seek` to above).
+                    zipFileContainer.write('\x00\x00') # Zip file comment length: 0 byte length; tell zip applications to stop reading.
+                    zipFileContainer.seek(0)  # Go back to the beginning of the file so the contents can be read again.
+                return zipFileContainer
+            archive = open(model_file, 'r+b')  # 'r+b' where 'r+' is read+write and 'b' is binary
+            archive = fix_zip_file(archive)
+            archive.extractall(root_dir)
+            archive.close()
+            
         print('Load from', best_model_path)
         model = JointBERT(config['model'], DEVICE, dataloader.tag_dim, dataloader.intent_dim)
         model.load_state_dict(torch.load(os.path.join(output_dir, 'pytorch_model.bin'), DEVICE))
