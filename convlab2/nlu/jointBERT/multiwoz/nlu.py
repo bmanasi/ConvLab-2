@@ -53,7 +53,7 @@ class BERTNLU(NLU):
                 outFile.write(data)
                 outFile.close()   # was missing this
                 with zipfile.ZipFile(path, 'r') as zip:
-                zip.extractall(root_dir)
+                    zip.extractall(root_dir)
         print('Load from', best_model_path)
         model = JointBERT(config['model'], DEVICE, dataloader.tag_dim, dataloader.intent_dim)
         model.load_state_dict(torch.load(os.path.join(output_dir, 'pytorch_model.bin'), DEVICE))
