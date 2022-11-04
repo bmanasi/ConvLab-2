@@ -1,6 +1,7 @@
 import os
 import re
 import zipfile
+import tarfile
 import json
 import torch
 from unidecode import unidecode
@@ -45,9 +46,14 @@ class BERTNLU(NLU):
                 os.makedirs(output_dir)
             print('Load from model_file param')
             archive_file = cached_path(model_file)
-            archive = zipfile.ZipFile(archive_file, 'r')
-            archive.extractall(root_dir)
-            archive.close()
+            #archive = zipfile.ZipFile(archive_file, 'r')
+            #archive.extractall(root_dir)
+            #archive.close()
+            with open(path, 'wb') as outFile:
+                outFile.write(data)
+                outFile.close()   # was missing this
+                with zipfile.ZipFile(path, 'r') as zip:
+                zip.extractall(root_dir)
         print('Load from', best_model_path)
         model = JointBERT(config['model'], DEVICE, dataloader.tag_dim, dataloader.intent_dim)
         model.load_state_dict(torch.load(os.path.join(output_dir, 'pytorch_model.bin'), DEVICE))
