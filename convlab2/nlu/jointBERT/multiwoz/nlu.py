@@ -26,8 +26,11 @@ class BERTNLU(NLU):
         # DEVICE = config['DEVICE']
         DEVICE = 'cpu' if not torch.cuda.is_available() else 'cuda:0'
         root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        print("root_dir:", root_dir)
         data_dir = os.path.join(root_dir, config['data_dir'])
+        print("data_dir:", data_dir)
         output_dir = os.path.join(root_dir, config['output_dir'])
+        print("output_dir:", output_dir)
 
         if not os.path.exists(os.path.join(data_dir, 'intent_vocab.json')):
             preprocess(mode)
@@ -41,26 +44,15 @@ class BERTNLU(NLU):
         print('tag num:', len(tag_vocab))
 
         best_model_path = os.path.join(output_dir, 'pytorch_model.bin')
+        print("best_model_path:", best_model_path)
         if not os.path.exists(best_model_path):
             if not os.path.exists(output_dir):
                 os.makedirs(output_dir)
             print('Load from model_file param')
-#           archive_file = cached_path(model_file)
-            #archive = zipfile.ZipFile(archive_file, 'r')
-            #archive.extractall(root_dir)
-            #archive.close()
-            def fix_zip_file(zipFileContainer):
-#                 Read the contents of the file
-                content = zipFileContainer.read()
-                pos = content.rfind("\x50\x4b\x05\x06".encode())  # reverse find: this string of bytes is the end of the zip's central directory.
-                if pos>0:  # Double check we're not at the beginning of the file so we don't blank out the file
-                    zipFileContainer.seek(pos+20)  # Seek to +20 in the file; see secion V.I in 'ZIP format' link above.
-                    zipFileContainer.truncate()  # Delete everything that comes after our current position in the file (where we `seek` to above).
-                    zipFileContainer.write('\x00\x00') # Zip file comment length: 0 byte length; tell zip applications to stop reading.
-                    zipFileContainer.seek(0)  # Go back to the beginning of the file so the contents can be read again.
-                return zipFileContainer
-            archive = open(model_file, 'r+b')  # 'r+b' where 'r+' is read+write and 'b' is binary
-            archive = fix_zip_file(archive)
+            archive_file = cached_path(model_file)
+            print(archive_file)
+            archive = zipfile.ZipFile(archive_file, 'r')
+            print(archive)
             archive.extractall(root_dir)
             archive.close()
             
