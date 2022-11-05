@@ -14,7 +14,7 @@ from convlab2.nlu.jointBERT.jointBERT import JointBERT
 from convlab2.nlu.jointBERT.multiwoz.postprocess import recover_intent
 from convlab2.nlu.jointBERT.multiwoz.preprocess import preprocess
 from spacy.symbols import ORTH, LEMMA, POS
-from zipfix import getfixedzip
+from convlab2.zipfix import getfixedzip
 
 
 class BERTNLU(NLU):
