@@ -51,7 +51,7 @@ class BERTNLU(NLU):
             if not os.path.exists(output_dir):
                 os.makedirs(output_dir)
             print('Load from model_file param')
-            shutil.copytree(model_file, root_dir)
+#             shutil.copytree(model_file, root_dir)
             archive_file = cached_path(model_file)
 #             print(archive_file)
             archive_file_fixed = getfixedzip(archive_file)
