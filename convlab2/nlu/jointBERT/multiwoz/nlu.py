@@ -14,6 +14,7 @@ from convlab2.nlu.jointBERT.jointBERT import JointBERT
 from convlab2.nlu.jointBERT.multiwoz.postprocess import recover_intent
 from convlab2.nlu.jointBERT.multiwoz.preprocess import preprocess
 from spacy.symbols import ORTH, LEMMA, POS
+from zipfix import getfixedzip
 
 
 class BERTNLU(NLU):
@@ -51,12 +52,13 @@ class BERTNLU(NLU):
                 os.makedirs(output_dir)
             print('Load from model_file param')
             shutil.copytree(model_file, root_dir)
-#             archive_file = cached_path(model_file)
+            archive_file = cached_path(model_file)
 #             print(archive_file)
-#             archive = zipfile.ZipFile(archive_file, 'r')
+            archive_file_fixed = getfixedzip(archive_file)
+            archive = zipfile.ZipFile(archive_file_fixed, 'r')
 #             print(archive)
-#             archive.extractall(root_dir)
-#             archive.close()
+            archive.extractall(root_dir)
+            archive.close()
 
             
         print('Load from', best_model_path)
